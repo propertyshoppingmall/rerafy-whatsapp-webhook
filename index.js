@@ -1,15 +1,15 @@
 const express = require("express");
-const fetch = require("node-fetch"); // if Node < 18
 const app = express();
 
 app.use(express.json());
 
+// ================= CONFIG =================
 const VERIFY_TOKEN = "rerafy_verify_123";
 const GRAPH_URL = "https://graph.facebook.com/v18.0";
-const TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_ID = process.env.PHONE_NUMBER_ID;
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// ---------- WEBHOOK VERIFY ----------
+// ================= WEBHOOK VERIFY =================
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -21,21 +21,23 @@ app.get("/webhook", (req, res) => {
   return res.sendStatus(403);
 });
 
-// ---------- SEND MESSAGE HELPER ----------
+// ================= SEND MESSAGE HELPER =================
 async function sendMessage(payload) {
-  const url = `${GRAPH_URL}/${PHONE_ID}/messages`;
-  const res = await fetch(url, {
+  const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${TOKEN}`,
+      Authorization: `Bearer ${WHATSAPP_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   });
-  return res.json();
+
+  return response.json();
 }
 
-// ---------- WELCOME MESSAGE ----------
+// ================= WELCOME MESSAGE =================
 async function sendWelcome(to) {
   return sendMessage({
     messaging_product: "whatsapp",
@@ -54,16 +56,25 @@ async function sendWelcome(to) {
       },
       action: {
         buttons: [
-          { type: "reply", reply: { id: "PRICE", title: "Check Project Prices" } },
-          { type: "reply", reply: { id: "LEGAL", title: "Check Legal / Risk" } },
-          { type: "reply", reply: { id: "FAQ", title: "FAQs about Rerafy" } },
+          {
+            type: "reply",
+            reply: { id: "PRICE", title: "Check Project Prices" },
+          },
+          {
+            type: "reply",
+            reply: { id: "LEGAL", title: "Check Legal / Risk" },
+          },
+          {
+            type: "reply",
+            reply: { id: "FAQ", title: "FAQs about Rerafy" },
+          },
         ],
       },
     },
   });
 }
 
-// ---------- FAQ MENU ----------
+// ================= FAQ MENU =================
 async function sendFaqMenu(to) {
   return sendMessage({
     messaging_product: "whatsapp",
@@ -71,21 +82,33 @@ async function sendFaqMenu(to) {
     type: "interactive",
     interactive: {
       type: "button",
-      body: { text: "Here are some quick answers 👇" },
+      body: {
+        text: "Here are some quick answers 👇",
+      },
       action: {
         buttons: [
-          { type: "reply", reply: { id: "FAQ_WHAT", title: "What is Rerafy?" } },
-          { type: "reply", reply: { id: "FAQ_WHY", title: "Why use Rerafy?" } },
-          { type: "reply", reply: { id: "FAQ_FREE", title: "Is it free & coverage?" } },
+          {
+            type: "reply",
+            reply: { id: "FAQ_WHAT", title: "What is Rerafy?" },
+          },
+          {
+            type: "reply",
+            reply: { id: "FAQ_WHY", title: "Why use Rerafy?" },
+          },
+          {
+            type: "reply",
+            reply: { id: "FAQ_FREE", title: "Is it free & coverage?" },
+          },
         ],
       },
     },
   });
 }
 
-// ---------- FAQ ANSWERS ----------
+// ================= FAQ ANSWERS =================
 async function sendFaqAnswer(to, type) {
   let text = "";
+
   if (type === "FAQ_WHAT") {
     text =
       "Rerafy is a buyer-side real estate intelligence service.\n\n" +
@@ -95,7 +118,9 @@ async function sendFaqAnswer(to, type) {
       "• Basic legal & project risk indicators\n\n" +
       "Would you like to check a specific project?\n" +
       "Please share the project name or location.";
-  } else if (type === "FAQ_WHY") {
+  }
+
+  if (type === "FAQ_WHY") {
     text =
       "Most buyers don’t know:\n" +
       "• Real prices at which flats get registered\n" +
@@ -103,7 +128,9 @@ async function sendFaqAnswer(to, type) {
       "• Basic legal or project risks\n\n" +
       "Rerafy helps you compare projects objectively and reduces the risk of overpaying.\n\n" +
       "Tell us the project name or area you’re considering.";
-  } else if (type === "FAQ_FREE") {
+  }
+
+  if (type === "FAQ_FREE") {
     text =
       "Yes ✅ Rerafy is currently 100% free for buyers.\n\n" +
       "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n" +
@@ -121,27 +148,33 @@ async function sendFaqAnswer(to, type) {
   });
 }
 
-// ---------- WEBHOOK RECEIVE ----------
+// ================= WEBHOOK RECEIVE =================
 app.post("/webhook", async (req, res) => {
   try {
-    console.log("📩 Incoming:", JSON.stringify(req.body, null, 2));
+    console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
 
     const entry = req.body.entry?.[0]?.changes?.[0]?.value;
-    const msg = entry?.messages?.[0];
-    if (!msg) return res.sendStatus(200);
+    const message = entry?.messages?.[0];
+    if (!message) return res.sendStatus(200);
 
-    const from = msg.from;
+    const from = message.from;
 
-    // Text message (Hi / prefilled)
-    if (msg.type === "text") {
+    // TEXT MESSAGE (Hi / Prefilled)
+    if (message.type === "text") {
       await sendWelcome(from);
     }
 
-    // Button clicks
-    if (msg.type === "interactive" && msg.interactive.type === "button_reply") {
-      const id = msg.interactive.button_reply.id;
+    // BUTTON CLICKS
+    if (
+      message.type === "interactive" &&
+      message.interactive.type === "button_reply"
+    ) {
+      const id = message.interactive.button_reply.id;
 
-      if (id === "FAQ") await sendFaqMenu(from);
+      if (id === "FAQ") {
+        await sendFaqMenu(from);
+      }
+
       if (id === "FAQ_WHAT" || id === "FAQ_WHY" || id === "FAQ_FREE") {
         await sendFaqAnswer(from, id);
       }
@@ -151,18 +184,21 @@ app.post("/webhook", async (req, res) => {
           messaging_product: "whatsapp",
           to: from,
           type: "text",
-          text: { body: "Please share the project name or location you’re checking." },
+          text: {
+            body: "Please share the project name or location you’re checking.",
+          },
         });
       }
     }
 
     res.sendStatus(200);
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error("❌ Error:", error);
     res.sendStatus(200);
   }
 });
 
+// ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
   console.log("Webhook running");
 });
