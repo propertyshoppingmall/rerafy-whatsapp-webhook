@@ -102,7 +102,7 @@ async function sendFaqMenu(to) {
           },
           {
             type: "reply",
-            reply: { id: "FAQ_FREE", title: "Is it free & coverage?" },
+            reply: { id: "FAQ_FREE", title: "Free & Coverage?" },
           },
         ],
       },
