@@ -20,6 +20,7 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // ================= WEBHOOK VERIFY =================
 app.get("/webhook", (req, res) => {
+  
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
@@ -169,7 +170,12 @@ app.post("/webhook", async (req, res) => {
     const message = entry?.messages?.[0];
     if (!message) return res.sendStatus(200);
 
+    // ✅ STEP 1: PROFILE NAME EXTRACTION (HERE)
+    const contact = entry?.contacts?.[0];
+    const profileName = contact?.profile?.name || "";
+
     const from = message.from;
+
 
     // ===============================
     // 1️⃣ BUTTON CLICKS → SAVE TO SHEET
@@ -215,26 +221,51 @@ app.post("/webhook", async (req, res) => {
     // ===============================
     // 2️⃣ TEXT MESSAGE → SAVE TO SHEET
     // ===============================
-    if (message.type === "text") {
+   if (message.type === "text") {
+  const text = message.text.body.trim();
 
-      // ✅ STEP 6A: SAVE TEXT MESSAGE
+  // If name not captured yet
+  if (!userState[from]?.name) {
+
+    // ✅ STEP 2A: USE PROFILE NAME IF AVAILABLE
+    if (profileName) {
+      userState[from] = { name: profileName };
+
       await saveLead({
         phone: from,
-        type: "text",
-        message: message.text.body,
+        name: profileName,
+        type: "profile_name",
+        message: "Captured from WhatsApp profile"
       });
 
-      // Existing logic
       await sendWelcome(from);
       return res.sendStatus(200);
     }
 
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("❌ Webhook error:", error);
-    res.sendStatus(200);
+    // ✅ STEP 2B: ASK NAME IF PROFILE NAME NOT AVAILABLE
+    userState[from] = { awaitingName: true };
+
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: { body: "May I know your name?" }
+    });
+
+    return res.sendStatus(200);
   }
-});
+
+  // ✅ NORMAL TEXT FLOW (PROJECT, MESSAGE, ETC.)
+  await saveLead({
+    phone: from,
+    name: userState[from].name,
+    type: "text",
+    message: text
+  });
+
+  return res.sendStatus(200);
+}
+
 
 
 
