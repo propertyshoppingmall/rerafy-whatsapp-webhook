@@ -2,6 +2,15 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTLPl5oHdfwj3vkFlj7mwan081W
+krLb8felUOXx_jAIiIr0nWIltKHV6EpOmcsuLIAEA/exec";
+async function saveLead(data) {
+  await fetch(SHEET_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
 
 // ================= CONFIG =================
 const VERIFY_TOKEN = "rerafy_verify_123";
@@ -156,22 +165,31 @@ async function sendFaqAnswer(to, type) {
 // ================= WEBHOOK RECEIVE =================
 app.post("/webhook", async (req, res) => {
   try {
-    console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
-
     const entry = req.body.entry?.[0]?.changes?.[0]?.value;
     const message = entry?.messages?.[0];
     if (!message) return res.sendStatus(200);
 
     const from = message.from;
 
-    // 1️⃣ HANDLE BUTTON CLICKS FIRST
+    // ===============================
+    // 1️⃣ BUTTON CLICKS → SAVE TO SHEET
+    // ===============================
     if (
       message.type === "interactive" &&
       message.interactive.type === "button_reply"
     ) {
       const id = message.interactive.button_reply.id;
-      console.log("🔘 Button clicked:", id);
+      const title = message.interactive.button_reply.title;
 
+      // ✅ STEP 6B: SAVE BUTTON ACTION
+      await saveLead({
+        phone: from,
+        type: "button",
+        button: id,
+        message: title,
+      });
+
+      // Existing logic
       if (id === "FAQ") {
         await sendFaqMenu(from);
       }
@@ -194,19 +212,30 @@ app.post("/webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    // 2️⃣ HANDLE TEXT MESSAGE (Hi / Prefilled)
+    // ===============================
+    // 2️⃣ TEXT MESSAGE → SAVE TO SHEET
+    // ===============================
     if (message.type === "text") {
-      console.log("💬 Text message received");
+
+      // ✅ STEP 6A: SAVE TEXT MESSAGE
+      await saveLead({
+        phone: from,
+        type: "text",
+        message: message.text.body,
+      });
+
+      // Existing logic
       await sendWelcome(from);
       return res.sendStatus(200);
     }
 
     res.sendStatus(200);
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error("❌ Webhook error:", error);
     res.sendStatus(200);
   }
 });
+
 
 
 // ================= START SERVER =================
