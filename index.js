@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 
-app.use(express.json());
+app.use(express.json());const userState = {};
+
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTLPl5oHdfwj3vkFlj7mwan081WkrLb8felUOXx_jAIiIr0nWIltKHV6EpOmcsuLIAEA/exec";
 
 async function saveLead(data) {
@@ -265,6 +266,12 @@ app.post("/webhook", async (req, res) => {
 
   return res.sendStatus(200);
 }
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("❌ Webhook error:", error);
+    res.sendStatus(200);
+  }
+});
 
 
 
