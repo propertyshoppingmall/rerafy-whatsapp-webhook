@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
+console.log("ENV CHECK → TOKEN exists:", !!process.env.WHATSAPP_TOKEN);
+console.log("ENV CHECK → PHONE ID:", process.env.PHONE_NUMBER_ID);
 
 // ================= CONFIG =================
 const VERIFY_TOKEN = "rerafy_verify_123";
