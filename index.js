@@ -25,6 +25,8 @@ app.get("/webhook", (req, res) => {
 async function sendMessage(payload) {
   const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
 
+  console.log("📤 Sending to WhatsApp:", JSON.stringify(payload, null, 2));
+
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -34,7 +36,10 @@ async function sendMessage(payload) {
     body: JSON.stringify(payload),
   });
 
-  return response.json();
+  const data = await response.json();
+  console.log("📥 WhatsApp API response:", data);
+
+  return data;
 }
 
 // ================= WELCOME MESSAGE =================
