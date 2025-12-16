@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTLPl5oHdfwj3vkFlj7mwan081W
-krLb8felUOXx_jAIiIr0nWIltKHV6EpOmcsuLIAEA/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTLPl5oHdfwj3vkFlj7mwan081WkrLb8felUOXx_jAIiIr0nWIltKHV6EpOmcsuLIAEA/exec";
+
 async function saveLead(data) {
   await fetch(SHEET_URL, {
     method: "POST",
