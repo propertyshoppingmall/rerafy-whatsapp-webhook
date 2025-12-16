@@ -116,7 +116,7 @@ async function sendFaqAnswer(to, type) {
 
   if (type === "FAQ_WHAT") {
     text =
-      "Rerafy is a buyer-side real estate intelligence service.\n\n" +
+      "Rerafy is a buyer-side real estate intelligence service platform.\n\n" +
       "We help homebuyers verify:\n" +
       "• Actual registered transaction prices\n" +
       "• Recent project-wise transactions\n" +
@@ -127,11 +127,11 @@ async function sendFaqAnswer(to, type) {
 
   if (type === "FAQ_WHY") {
     text =
-      "Most buyers don’t know:\n" +
-      "• Real prices at which flats get registered\n" +
+      "Rerafy Provides:\n" +
+      "• Real prices at which flats get sold\n" +
       "• Past transactions in the same project\n" +
       "• Basic legal or project risks\n\n" +
-      "Rerafy helps you compare projects objectively and reduces the risk of overpaying.\n\n" +
+      "Rerafy helps you compare projects objectively and reduces the risk of overpaying & risk checks.\n\n" +
       "Tell us the project name or area you’re considering.";
   }
 
