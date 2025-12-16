@@ -164,17 +164,13 @@ app.post("/webhook", async (req, res) => {
 
     const from = message.from;
 
-    // TEXT MESSAGE (Hi / Prefilled)
-    if (message.type === "text") {
-      await sendWelcome(from);
-    }
-
-    // BUTTON CLICKS
+    // 1️⃣ HANDLE BUTTON CLICKS FIRST
     if (
       message.type === "interactive" &&
       message.interactive.type === "button_reply"
     ) {
       const id = message.interactive.button_reply.id;
+      console.log("🔘 Button clicked:", id);
 
       if (id === "FAQ") {
         await sendFaqMenu(from);
@@ -194,6 +190,15 @@ app.post("/webhook", async (req, res) => {
           },
         });
       }
+
+      return res.sendStatus(200);
+    }
+
+    // 2️⃣ HANDLE TEXT MESSAGE (Hi / Prefilled)
+    if (message.type === "text") {
+      console.log("💬 Text message received");
+      await sendWelcome(from);
+      return res.sendStatus(200);
     }
 
     res.sendStatus(200);
@@ -202,6 +207,7 @@ app.post("/webhook", async (req, res) => {
     res.sendStatus(200);
   }
 });
+
 
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
