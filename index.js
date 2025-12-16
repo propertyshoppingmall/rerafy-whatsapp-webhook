@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());const userState = {};
 
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTLPl5oHdfwj3vkFlj7mwan081WkrLb8felUOXx_jAIiIr0nWIltKHV6EpOmcsuLIAEA/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzowe3-pJe08pcakZwdoa8KeHLTnFGrkJXraayaBXrO2xPDLV6BWvdhdmnA0A8X1DyG/exec";
 
 async function saveLead(data) {
   await fetch(SHEET_URL, {
