@@ -189,37 +189,45 @@ app.post("/webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    // TEXT HANDLING
-    if (message.type === "text") {
-      const text = message.text.body.trim();
+  // ================= TEXT HANDLING =================
+if (message.type === "text") {
+  const text = message.text.body.trim();
 
-      await saveLead({
-        phone: from,
-        name: userState[from]?.name || "",
-        type: "text",
-        message: text,
-      });
-
-      if (["1", "2", "3", "4"].includes(text)) {
-        await sendFaqAnswer(from, text);
-        return res.sendStatus(200);
-      }
-
-      if (!userState[from]?.welcomed) {
-        userState[from] = { ...userState[from], welcomed: true };
-        await sendWelcome(from);
-        await sendFaqNumbers(from);
-      }
-
-      return res.sendStatus(200);
-    }
-
-    res.sendStatus(200);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(200);
+  // Initialize state if not exists
+  if (!userState[from]) {
+    userState[from] = {};
   }
-});
+
+  // Save every text
+  await saveLead({
+    phone: from,
+    name: userState[from]?.name || "",
+    type: "text",
+    message: text,
+  });
+
+  // 1️⃣ FIRST MESSAGE → SEND WELCOME + FAQ
+  if (!userState[from].welcomed) {
+    userState[from].welcomed = true;
+
+    await sendWelcome(from);
+    await sendFaqNumbers(from);
+
+    return res.sendStatus(200);
+  }
+
+  // 2️⃣ HANDLE FAQ NUMBER REPLIES
+  if (["1", "2", "3", "4"].includes(text)) {
+    await sendFaqAnswer(from, text);
+    return res.sendStatus(200);
+  }
+
+  // 3️⃣ NORMAL TEXT (PROJECT NAME, QUESTIONS)
+  // (Human or future logic goes here)
+
+  return res.sendStatus(200);
+}
+
 
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
