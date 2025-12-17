@@ -97,7 +97,7 @@ async function sendFaqAnswer(to, number) {
 
   if (number === "1") {
     text =
-      "Rerafy is a buyer-side real estate intelligence service.\n\n" +
+      "Rerafy is a buyer-side real estate intelligence service platform.\n\n" +
       "We help buyers check actual registered prices, recent deals " +
       "inside the same project and basic legal & risk indicators.\n\n";
   }
@@ -113,6 +113,7 @@ async function sendFaqAnswer(to, number) {
     text =
       "Yes ✅ Rerafy is currently 100% free for buyers.\n\n" +
       "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n";
+     "The service is offered only to genuine buyers, with some fair-use conditions.\n\n";
   }
 
   if (number === "4") {
