@@ -66,8 +66,8 @@ async function sendWelcome(to) {
           { type: "reply", reply: { id: "PRICE", title: "Check Project Prices" } },
           { type: "reply", reply: { id: "LEGAL", title: "Check Legal / Risk" } },
           {
-            type: "url",
-            url: {
+            type: "cta_url",
+            cta_url: {
               link: "https://wa.me/917021418331",
               title: "Chat with Expert",
             },
