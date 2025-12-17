@@ -226,11 +226,6 @@ if (message.type === "text") {
   return res.sendStatus(200);
 }
 
-  catch (err) {
-    console.error(err);
-    res.sendStatus(200);
-  }
-});
 
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
