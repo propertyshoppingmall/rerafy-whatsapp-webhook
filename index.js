@@ -8,7 +8,7 @@ const VERIFY_TOKEN = "rerafy_verify_123";
 const GRAPH_URL = "https://graph.facebook.com/v18.0";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbXXXX/exec"; // 🔴 replace
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbx20xcz7tIoNSwoWrCVzAv8g7lpGQJLSmwn-aXJsptiU64uf4SpYBKwGIRSP-LUYdw/exec"; // 🔴 replace
 
 // ================= MEMORY =================
 const userState = {};
