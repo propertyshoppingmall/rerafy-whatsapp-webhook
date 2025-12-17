@@ -189,16 +189,14 @@ app.post("/webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-  // ================= TEXT HANDLING =================
+// ================= TEXT HANDLING =================
 if (message.type === "text") {
   const text = message.text.body.trim();
 
-  // Initialize state if not exists
   if (!userState[from]) {
     userState[from] = {};
   }
 
-  // Save every text
   await saveLead({
     phone: from,
     name: userState[from]?.name || "",
@@ -206,7 +204,7 @@ if (message.type === "text") {
     message: text,
   });
 
-  // 1️⃣ FIRST MESSAGE → SEND WELCOME + FAQ
+  // First message → welcome + FAQ
   if (!userState[from].welcomed) {
     userState[from].welcomed = true;
 
@@ -216,18 +214,25 @@ if (message.type === "text") {
     return res.sendStatus(200);
   }
 
-  // 2️⃣ HANDLE FAQ NUMBER REPLIES
+  // FAQ replies
   if (["1", "2", "3", "4"].includes(text)) {
     await sendFaqAnswer(from, text);
     return res.sendStatus(200);
   }
 
-  // 3️⃣ NORMAL TEXT (PROJECT NAME, QUESTIONS)
-  // (Human or future logic goes here)
-
   return res.sendStatus(200);
 }
 
+
+  // 3️⃣ NORMAL TEXT (PROJECT NAME, QUESTIONS)
+  // (Human or future logic goes here)
+
+     return res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(200);
+  }
+});
 
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
