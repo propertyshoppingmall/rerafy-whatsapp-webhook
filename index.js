@@ -8,7 +8,7 @@ const VERIFY_TOKEN = "rerafy_verify_123";
 const GRAPH_URL = "https://graph.facebook.com/v18.0";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbXXXX/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbXXXX/exec"; // <-- replace
 
 // ================= MEMORY =================
 const userState = {};
@@ -42,7 +42,7 @@ async function sendMessage(payload) {
   });
 }
 
-// ================= WELCOME =================
+// ================= WELCOME MESSAGE =================
 async function sendWelcome(to) {
   return sendMessage({
     messaging_product: "whatsapp",
@@ -104,14 +104,15 @@ async function sendFaqAnswer(to, number) {
   if (number === "1") {
     text =
       "Rerafy is a buyer-side real estate intelligence service.\n\n" +
-      "We help buyers check real registered prices, recent deals inside the project " +
-      "and basic legal & risk indicators.\n\n";
+      "We help property buyers check actual registered prices, recent deals " +
+      "inside the same project and basic legal & risk indicators.\n\n";
   }
 
   if (number === "2") {
     text =
       "Most buyers decide without seeing the full picture.\n\n" +
-      "Rerafy helps you compare projects using real transaction data and avoid overpaying.\n\n";
+      "Rerafy helps you compare projects using real transaction data and " +
+      "reduces the risk of overpaying.\n\n";
   }
 
   if (number === "3") {
@@ -123,7 +124,10 @@ async function sendFaqAnswer(to, number) {
   if (number === "4") {
     text =
       "Rerafy covers all of Maharashtra.\n\n" +
-      "Strong focus areas include Mumbai, Thane and Navi Mumbai.\n\n";
+      "Strong focus areas:\n" +
+      "• Mumbai\n" +
+      "• Thane\n" +
+      "• Navi Mumbai\n\n";
   }
 
   text +=
@@ -159,73 +163,78 @@ app.post("/webhook", async (req, res) => {
     const from = message.from;
     const profileName = entry?.contacts?.[0]?.profile?.name || "";
 
-    if (!userState[from] && profileName) {
-      userState[from] = { name: profileName };
+    // Init state
+    if (!userState[from]) {
+      userState[from] = {};
     }
 
-    // BUTTON HANDLING
+    // Capture profile name once
+    if (!userState[from].name && profileName) {
+      userState[from].name = profileName;
+    }
+
+    // ================= BUTTON HANDLING =================
     if (message.type === "interactive") {
-      const id = message.interactive.button_reply?.id || "";
+      const reply = message.interactive.button_reply;
 
       await saveLead({
         phone: from,
         name: userState[from]?.name || "",
         type: "button",
-        button: id,
-        message: message.interactive.button_reply?.title || "",
+        button: reply.id,
+        message: reply.title,
       });
 
-      if (id === "PRICE" || id === "LEGAL") {
+      if (reply.id === "PRICE" || reply.id === "LEGAL") {
         await sendMessage({
           messaging_product: "whatsapp",
           to: from,
           type: "text",
-          text: { body: "Please share the project name or location you’re checking." },
+          text: {
+            body: "Please share the project name or location you’re checking.",
+          },
         });
-
-        await sendFaqNumbers(from);
       }
 
       return res.sendStatus(200);
     }
 
-// ================= TEXT HANDLING =================
-if (message.type === "text") {
-  const text = message.text.body.trim();
+    // ================= TEXT HANDLING =================
+    if (message.type === "text") {
+      const text = message.text.body.trim();
 
-  // Ensure state exists
-  if (!userState[from]) {
-    userState[from] = {};
+      await saveLead({
+        phone: from,
+        name: userState[from]?.name || "",
+        type: "text",
+        message: text,
+      });
+
+      // 🔥 FIRST MESSAGE → WELCOME FIRST, THEN FAQ
+      if (!userState[from].welcomed) {
+        userState[from].welcomed = true;
+
+        await sendWelcome(from);
+        await sendFaqNumbers(from);
+
+        return res.sendStatus(200);
+      }
+
+      // FAQ number replies
+      if (["1", "2", "3", "4"].includes(text)) {
+        await sendFaqAnswer(from, text);
+        return res.sendStatus(200);
+      }
+
+      return res.sendStatus(200);
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Webhook error:", err);
+    res.sendStatus(200);
   }
-
-  // Save incoming text
-  await saveLead({
-    phone: from,
-    name: userState[from]?.name || "",
-    type: "text",
-    message: text,
-  });
-
-  // 1️⃣ FIRST MESSAGE EVER → WELCOME + FAQ
-  if (!userState[from].welcomed) {
-    userState[from].welcomed = true;
-
-    await sendWelcome(from);      // ✅ ALWAYS FIRST
-    await sendFaqNumbers(from);   // ✅ AFTER WELCOME
-
-    return res.sendStatus(200);   // ⛔ STOP HERE
-  }
-
-  // 2️⃣ FAQ NUMBER HANDLING
-  if (["1", "2", "3", "4"].includes(text)) {
-    await sendFaqAnswer(from, text);
-    return res.sendStatus(200);
-  }
-
-  // 3️⃣ NORMAL TEXT (PROJECT NAME, QUESTIONS)
-  return res.sendStatus(200);
-}
-
+});
 
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
