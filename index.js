@@ -112,7 +112,7 @@ async function sendFaqAnswer(to, number) {
   if (number === "3") {
     text =
       "Yes ✅ Rerafy is currently 100% free for buyers.\n\n" +
-      "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n";
+      "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n"; +
      "The service is offered only to genuine buyers, with some fair-use conditions.\n\n";
   }
 
