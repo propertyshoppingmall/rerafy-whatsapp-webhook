@@ -8,12 +8,12 @@ const VERIFY_TOKEN = "rerafy_verify_123";
 const GRAPH_URL = "https://graph.facebook.com/v18.0";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbXXXX/exec"; // <-- replace
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbXXXX/exec"; // 🔴 replace
 
 // ================= MEMORY =================
 const userState = {};
 
-// ================= SAVE LEAD =================
+// ================= SAVE LEAD TO GOOGLE SHEET =================
 async function saveLead(data) {
   await fetch(SHEET_URL, {
     method: "POST",
@@ -65,13 +65,7 @@ async function sendWelcome(to) {
         buttons: [
           { type: "reply", reply: { id: "PRICE", title: "Check Project Prices" } },
           { type: "reply", reply: { id: "LEGAL", title: "Check Legal / Risk" } },
-          {
-            type: "cta_url",
-            cta_url: {
-              link: "https://wa.me/917021418331",
-              title: "Chat with Expert",
-            },
-          },
+          { type: "reply", reply: { id: "EXPERT", title: "Chat with Expert" } },
         ],
       },
     },
@@ -104,7 +98,7 @@ async function sendFaqAnswer(to, number) {
   if (number === "1") {
     text =
       "Rerafy is a buyer-side real estate intelligence service.\n\n" +
-      "We help property buyers check actual registered prices, recent deals " +
+      "We help buyers check actual registered prices, recent deals " +
       "inside the same project and basic legal & risk indicators.\n\n";
   }
 
@@ -164,9 +158,7 @@ app.post("/webhook", async (req, res) => {
     const profileName = entry?.contacts?.[0]?.profile?.name || "";
 
     // Init state
-    if (!userState[from]) {
-      userState[from] = {};
-    }
+    if (!userState[from]) userState[from] = {};
 
     // Capture profile name once
     if (!userState[from].name && profileName) {
@@ -185,6 +177,21 @@ app.post("/webhook", async (req, res) => {
         message: reply.title,
       });
 
+      if (reply.id === "EXPERT") {
+        await sendMessage({
+          messaging_product: "whatsapp",
+          to: from,
+          type: "text",
+          text: {
+            body:
+              "You’re now connecting with a human expert 👇\n\n" +
+              "Chat directly here:\n" +
+              "https://wa.me/917021418331",
+          },
+        });
+        return res.sendStatus(200);
+      }
+
       if (reply.id === "PRICE" || reply.id === "LEGAL") {
         await sendMessage({
           messaging_product: "whatsapp",
@@ -194,9 +201,8 @@ app.post("/webhook", async (req, res) => {
             body: "Please share the project name or location you’re checking.",
           },
         });
+        return res.sendStatus(200);
       }
-
-      return res.sendStatus(200);
     }
 
     // ================= TEXT HANDLING =================
@@ -210,7 +216,7 @@ app.post("/webhook", async (req, res) => {
         message: text,
       });
 
-      // 🔥 FIRST MESSAGE → WELCOME FIRST, THEN FAQ
+      // FIRST MESSAGE → WELCOME + FAQ
       if (!userState[from].welcomed) {
         userState[from].welcomed = true;
 
