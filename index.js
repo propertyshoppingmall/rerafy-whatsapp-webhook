@@ -52,9 +52,9 @@ async function sendWelcome(to) {
       type: "button",
       body: {
         text:
-          text:
+text:
   "Hi 👋 Welcome to *Rerafy™* — a real estate data intelligence platform.\n\n" +
-  "We help *buyers, sellers,investors & tenant* make smarter property decisions using *real transaction data* — the same intelligence trusted by serious investors.\n\n" +
+  "We help *buyers, sellers, investors & tenants* make smarter property decisions using *real transaction data* — the same intelligence trusted by serious investors.\n\n" +
   "With Rerafy™, you can:\n" +
   "• Check actual registered prices\n" +
   "• See recent deals within the same project\n" +
@@ -63,7 +63,6 @@ async function sendWelcome(to) {
   "All in one place — for faster, more confident decisions.\n\n" +
   "How would you like to proceed?\n\n" +
   "👇 Please choose an option below"
-      },
       action: {
         buttons: [
           { type: "reply", reply: { id: "PRICE", title: "Check Project Prices" } },
