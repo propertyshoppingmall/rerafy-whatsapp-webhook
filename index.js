@@ -52,14 +52,17 @@ async function sendWelcome(to) {
       type: "button",
       body: {
         text:
-          "Hi 👋 Welcome to *Rerafy™*.\n\n" +
-          "We help Property *Buyers/Sellers/Investors* make smarter decisions using *real transaction data* — " +
-          "the same kind of data large investors rely on.\n\n" +
-          "With Rerafy™, you can:\n" +
-          "• Check actual registered prices\n" +
-          "• See recent deals in the same project\n" +
-          "• Understand basic legal & risk signals\n\n" +
-          "How would you like to proceed?",
+          text:
+  "Hi 👋 Welcome to *Rerafy™* — a real estate data intelligence platform.\n\n" +
+  "We help *buyers, sellers,investors & tenant* make smarter property decisions using *real transaction data* — the same intelligence trusted by serious investors.\n\n" +
+  "With Rerafy™, you can:\n" +
+  "• Check actual registered prices\n" +
+  "• See recent deals within the same project\n" +
+  "• Get basic legal & risk insights\n" +
+  "• Connect with a strong realtor network\n\n" +
+  "All in one place — for faster, more confident decisions.\n\n" +
+  "How would you like to proceed?\n\n" +
+  "👇 Please choose an option below"
       },
       action: {
         buttons: [
