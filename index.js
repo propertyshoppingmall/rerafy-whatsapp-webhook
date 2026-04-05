@@ -52,10 +52,10 @@ async function sendWelcome(to) {
       type: "button",
       body: {
         text:
-          "Hi 👋 Welcome to Rerafy.\n\n" +
-          "We help property buyers make smarter decisions using real transaction data — " +
+          "Hi 👋 Welcome to *Rerafy™*.\n\n" +
+          "We help Property *Buyers/Sellers/Investors* make smarter decisions using *real transaction data* — " +
           "the same kind of data large investors rely on.\n\n" +
-          "With Rerafy, you can:\n" +
+          "With Rerafy™, you can:\n" +
           "• Check actual registered prices\n" +
           "• See recent deals in the same project\n" +
           "• Understand basic legal & risk signals\n\n" +
@@ -80,12 +80,12 @@ async function sendFaqNumbers(to) {
     type: "text",
     text: {
       body:
-        "Before you decide, here are some quick answers about Rerafy 👇\n\n" +
+        "Before you decide, here are some quick answers about *Rerafy™* 👇\n\n" +
         "Reply with a number:\n\n" +
-        "1️⃣ What is Rerafy?\n" +
-        "2️⃣ Why should I use Rerafy before buying a property?\n" +
-        "3️⃣ Is Rerafy free?\n" +
-        "4️⃣ Which locations does Rerafy cover?\n\n" +
+        "1️⃣ What is *Rerafy*?\n" +
+        "2️⃣ Why should I use *Rerafy™* before *buying/selling* a property?\n" +
+        "3️⃣ Is *Rerafy™* free?\n" +
+        "4️⃣ Which locations does *Rerafy™* cover?\n\n" +
         "Just reply with 1, 2, 3 or 4.",
     },
   });
@@ -97,28 +97,28 @@ async function sendFaqAnswer(to, number) {
 
   if (number === "1") {
     text =
-      "Rerafy is a buyer-side real estate intelligence service platform.\n\n" +
-      "We help buyers check actual registered prices, recent deals " +
+      "Rerafy™ is a real estate data intelligence platform that helps buyers and sellers make better decisions using real transaction data and a strong realtor network.\n\n" +
+      "We help buyers/sellers check actual registered prices, recent deals " +
       "inside the same project and basic legal & risk indicators.\n\n";
   }
 
   if (number === "2") {
     text =
       "Most buyers decide without seeing the full picture.\n\n" +
-      "Rerafy helps you compare projects using real transaction data and " +
+      "Rerafy™ helps you compare projects using real transaction data and " +
       "reduces the risk of overpaying.\n\n";
   }
 
   if (number === "3") {
     text =
-      "Yes ✅ Rerafy is currently 100% free for buyers.\n\n" +
+      "Yes ✅ Rerafy™ is currently 100% free for buyers.\n\n" +
       "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n"; +
      "The service is offered only to genuine buyers, with some fair-use conditions.\n\n";
   }
 
   if (number === "4") {
     text =
-      "Rerafy covers all of Maharashtra.\n\n" +
+      "Rerafy™ covers all of Maharashtra.\n\n" +
       "Strong focus areas:\n" +
       "• Mumbai\n" +
       "• Thane\n" +
