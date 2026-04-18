@@ -248,6 +248,7 @@ app.post("/webhook", async (req, res) => {
     res.sendStatus(200);
   }
 });
+
 app.get("/send", async (req, res) => {
   try {
     const phone = req.query.phone;
@@ -256,12 +257,12 @@ app.get("/send", async (req, res) => {
       return res.send("❌ Please provide phone number");
     }
 
-    await sendTemplateMessage(phone);
+    const response = await sendTemplateMessage(phone);
 
-    res.send(`✅ Message sent to ${phone}`);
+    res.send(`✅ Sent. Response: ${JSON.stringify(response)}`);
   } catch (err) {
-    console.error(err);
-    res.send("❌ Error sending message");
+    console.error("ERROR:", err);
+    res.send(`❌ Error: ${err.message}`);
   }
 });
 // ================= START SERVER =================
