@@ -41,22 +41,14 @@ async function sendMessage(payload) {
     body: JSON.stringify(payload),
   });
 }
-async function sendTemplateMessage(to, name) {
+async function sendTemplateMessage(to) {
   return sendMessage({
     messaging_product: "whatsapp",
     to,
     type: "template",
     template: {
-      name: "rerafy_property_insights_v1", // your template name
-      language: { code: "en" },
-      components: [
-        {
-          type: "body",
-          parameters: [
-            { type: "text", text: name }
-          ]
-        }
-      ]
+      name: "rerafy_property_insights_v1",
+      language: { code: "en" }
     }
   });
 }
@@ -265,13 +257,12 @@ app.post("/webhook", async (req, res) => {
 app.get("/send", async (req, res) => {
   try {
     const phone = req.query.phone;
-    const name = req.query.name || "Customer";
 
     if (!phone) {
       return res.send("❌ Please provide phone number");
     }
 
-    await sendTemplateMessage(phone, name);
+    await sendTemplateMessage(phone);
 
     res.send(`✅ Message sent to ${phone}`);
   } catch (err) {
