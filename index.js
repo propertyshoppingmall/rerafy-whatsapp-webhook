@@ -46,6 +46,17 @@ async function sendMessage(payload) {
 
   return data;
 }
+async function sendTemplateMessage(to) {
+  return sendMessage({
+    messaging_product: "whatsapp",
+    to,
+    type: "template",
+    template: {
+      name: "rerafy_property_insights_v1",
+      language: { code: "en" }
+    }
+  });
+}
 // ================= WELCOME MESSAGE =================
 async function sendWelcome(to) {
   return sendMessage({
