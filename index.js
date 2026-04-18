@@ -41,16 +41,22 @@ async function sendMessage(payload) {
     body: JSON.stringify(payload),
   });
 }
-async function sendTemplateMessage(to) {
-  return sendMessage({
-    messaging_product: "whatsapp",
-    to,
-    type: "template",
-    template: {
-      name: "rerafy_property_insights_v1",
-      language: { code: "en" }
-    }
+async function sendMessage(payload) {
+  const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
+
+  const data = await response.json();
+  console.log("📩 WhatsApp API Response:", data);
+
+  return data;
 }
 // ================= WELCOME MESSAGE =================
 async function sendWelcome(to) {
