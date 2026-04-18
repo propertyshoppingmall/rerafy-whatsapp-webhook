@@ -18,20 +18,7 @@ async function sendTemplateMessage(to) {
     type: "template",
     template: {
       name: "rerafy_property_insights_v1",
-      language: { code: "en" },
-      components: [
-        {
-          type: "header",
-          parameters: [
-            {
-              type: "image",
-              image: {
-                link: "https://images.unsplash.com/photo-1560518883-ce09059eeffa"
-              }
-            }
-          ]
-        }
-      ]
+      language: { code: "en" }
     }
   });
 }
