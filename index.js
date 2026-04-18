@@ -10,24 +10,6 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbx20xcz7tIoNSwoWrCVzAv8g7lpGQJLSmwn-aXJsptiU64uf4SpYBKwGIRSP-LUYdw/exec"; // 🔴 replace
 
-// ================= MEMORY =================
-const userState = {};
-
-// ================= SAVE LEAD TO GOOGLE SHEET =================
-async function saveLead(data) {
-  await fetch(SHEET_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      phone: data.phone || "",
-      name: data.name || "",
-      type: data.type || "",
-      button: data.button || "",
-      message: data.message || "",
-    }),
-  });
-}
-
 // ================= SEND MESSAGE =================
 async function sendMessage(payload) {
   const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
@@ -46,6 +28,8 @@ async function sendMessage(payload) {
 
   return data;
 }
+
+// ================= SEND TEMPLATE =================
 async function sendTemplateMessage(to) {
   return sendMessage({
     messaging_product: "whatsapp",
@@ -57,6 +41,43 @@ async function sendTemplateMessage(to) {
     }
   });
 }
+
+app.get("/send", async (req, res) => {
+  try {
+    const phone = req.query.phone;
+
+    if (!phone) {
+      return res.send("❌ Please provide phone number");
+    }
+
+    const response = await sendTemplateMessage(phone);
+
+    res.send(`✅ Sent. Response: ${JSON.stringify(response)}`);
+  } catch (err) {
+    console.error("ERROR:", err);
+    res.send(`❌ Error: ${err.message}`);
+  }
+});
+
+// ================= MEMORY =================
+const userState = {};
+
+// ================= SAVE LEAD TO GOOGLE SHEET =================
+async function saveLead(data) {
+  await fetch(SHEET_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      phone: data.phone || "",
+      name: data.name || "",
+      type: data.type || "",
+      button: data.button || "",
+      message: data.message || "",
+    }),
+  });
+}
+
+
 // ================= WELCOME MESSAGE =================
 async function sendWelcome(to) {
   return sendMessage({
@@ -129,7 +150,7 @@ async function sendFaqAnswer(to, number) {
   if (number === "3") {
     text =
       "Yes ✅ Rerafy™ is currently 100% free for buyers.\n\n" +
-      "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n"; +
+      "Buyers don’t pay for price insights, transaction data or basic risk checks.\n\n" +
      "The service is offered only to genuine buyers, with some fair-use conditions.\n\n";
   }
 
@@ -260,22 +281,6 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-app.get("/send", async (req, res) => {
-  try {
-    const phone = req.query.phone;
-
-    if (!phone) {
-      return res.send("❌ Please provide phone number");
-    }
-
-    const response = await sendTemplateMessage(phone);
-
-    res.send(`✅ Sent. Response: ${JSON.stringify(response)}`);
-  } catch (err) {
-    console.error("ERROR:", err);
-    res.send(`❌ Error: ${err.message}`);
-  }
-});
 // ================= START SERVER =================
 app.listen(process.env.PORT || 3000, () => {
   console.log("Webhook running");
