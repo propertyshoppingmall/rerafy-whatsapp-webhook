@@ -32,18 +32,6 @@ async function saveLead(data) {
 async function sendMessage(payload) {
   const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
 
-  await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${WHATSAPP_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-}
-async function sendMessage(payload) {
-  const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
-
   const response = await fetch(url, {
     method: "POST",
     headers: {
