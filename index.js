@@ -30,29 +30,70 @@ async function sendMessage(payload) {
 }
 
 // ================= SEND TEMPLATE =================
-async function sendTemplateMessage(to) {
+async function sendDynamicTemplate(to, template, variables = [], image = null) {
+
+  let components = [];
+
+  // 👉 Image header
+  if (image) {
+    components.push({
+      type: "header",
+      parameters: [
+        {
+          type: "image",
+          image: { link: image }
+        }
+      ]
+    });
+  }
+
+  // 👉 Body variables
+  if (variables.length > 0) {
+    components.push({
+      type: "body",
+      parameters: variables.map(v => ({
+        type: "text",
+        text: v
+      }))
+    });
+  }
+
   return sendMessage({
     messaging_product: "whatsapp",
     to,
     type: "template",
     template: {
-      name: "rerafy_property_insights_v1",
-      language: { code: "en" }
+      name: template,
+      language: { code: "en" },
+      ...(components.length > 0 && { components })
     }
   });
 }
 
 app.get("/send", async (req, res) => {
   try {
-    const phone = req.query.phone;
+    const { phone, template, image } = req.query;
 
-    if (!phone) {
-      return res.send("❌ Please provide phone number");
+    if (!phone || !template) {
+      return res.send("❌ Phone & template required");
     }
 
-    const response = await sendTemplateMessage(phone);
+    // Collect variables dynamically (v1 to v10)
+    let variables = [];
+    for (let i = 1; i <= 10; i++) {
+      const val = req.query[`v${i}`];
+      if (val) variables.push(val);
+    }
 
-    res.send(`✅ Sent. Response: ${JSON.stringify(response)}`);
+    const response = await sendDynamicTemplate(
+      phone,
+      template,
+      variables,
+      image
+    );
+
+    res.send(`✅ Sent: ${JSON.stringify(response)}`);
+
   } catch (err) {
     console.error("ERROR:", err);
     res.send(`❌ Error: ${err.message}`);
