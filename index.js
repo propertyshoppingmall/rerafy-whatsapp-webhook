@@ -230,20 +230,45 @@ app.get("/webhook", (req, res) => {
 // ================= WEBHOOK RECEIVE =================
 app.post("/webhook", async (req, res) => {
   try {
-    const entry = req.body.entry?.[0]?.changes?.[0]?.value;
-    const message = entry?.messages?.[0];
+
+    const value = req.body.entry?.[0]?.changes?.[0]?.value;
+
+    // ✅ 1. DELIVERY STATUS HANDLER
+    if (value?.statuses) {
+      const statusObj = value.statuses[0];
+
+      const messageId = statusObj.id;
+      const status = statusObj.status;
+
+      await fetch(SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "status_update",
+          message_id: messageId,
+          status: status
+        })
+      });
+
+      return res.sendStatus(200);
+    }
+
+    // ✅ 2. SAME AS OLD SCRIPT (UNCHANGED)
+    const message = value?.messages?.[0];
     if (!message) return res.sendStatus(200);
 
     const from = message.from;
-    const profileName = entry?.contacts?.[0]?.profile?.name || "";
+    const profileName = value?.contacts?.[0]?.profile?.name || "";
 
-    // Init state
     if (!userState[from]) userState[from] = {};
 
-    // Capture profile name once
     if (!userState[from].name && profileName) {
       userState[from].name = profileName;
     }
+
+    // 👉 KEEP YOUR OLD BUTTON LOGIC
+    // 👉 KEEP YOUR OLD TEXT LOGIC
+
 
     // ================= BUTTON HANDLING =================
     if (message.type === "interactive") {
