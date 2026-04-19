@@ -92,7 +92,7 @@ app.get("/send", async (req, res) => {
       image
     );
 
-    res.send(`✅ Sent: ${JSON.stringify(response)}`);
+    res.json(response);
 
   } catch (err) {
     console.error("ERROR:", err);
