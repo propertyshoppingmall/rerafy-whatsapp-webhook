@@ -7,17 +7,29 @@ app.use(express.json());
 const VERIFY_TOKEN = "rerafy_verify_123";
 const GRAPH_URL = "https://graph.facebook.com/v18.0";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+const NUMBERS = {
+  client: {
+    phone_id: process.env.PHONE_NUMBER_ID, // existing working number
+    token: process.env.WHATSAPP_TOKEN
+  },
+  realtor: {
+    phone_id: "1098985376629421", // your new number
+    token: process.env.WHATSAPP_TOKEN
+  }
+};
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbx20xcz7tIoNSwoWrCVzAv8g7lpGQJLSmwn-aXJsptiU64uf4SpYBKwGIRSP-LUYdw/exec"; // 🔴 replace
 
 // ================= SEND MESSAGE =================
-async function sendMessage(payload) {
-  const url = `${GRAPH_URL}/${PHONE_NUMBER_ID}/messages`;
+async function sendMessage(payload, numberType = "client") {
+
+  const config = NUMBERS[numberType];
+
+  const url = `${GRAPH_URL}/${config.phone_id}/messages`;
 
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+      Authorization: `Bearer ${config.token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
@@ -30,7 +42,7 @@ async function sendMessage(payload) {
 }
 
 // ================= SEND TEMPLATE =================
-async function sendDynamicTemplate(to, template, variables = [], image = null) {
+async function sendDynamicTemplate(to, template, variables = [], image = null, numberType = "client") {
 
   let components = [];
 
@@ -59,20 +71,21 @@ async function sendDynamicTemplate(to, template, variables = [], image = null) {
   }
 
   return sendMessage({
-    messaging_product: "whatsapp",
-    to,
-    type: "template",
-    template: {
-      name: template,
-      language: { code: "en" },
-      ...(components.length > 0 && { components })
-    }
-  });
-}
+  messaging_product: "whatsapp",
+  to,
+  type: "template",
+  template: {
+    name: template,
+    language: { code: "en" },
+    ...(components.length > 0 && { components })
+  }
+}, numberType);
+  }
 
 app.get("/send", async (req, res) => {
   try {
-    const { phone, template, image } = req.query;
+    const { phone, template, image, number } = req.query;
+const numberType = number || "client";
 
     if (!phone || !template) {
       return res.send("❌ Phone & template required");
@@ -86,11 +99,12 @@ app.get("/send", async (req, res) => {
     }
 
     const response = await sendDynamicTemplate(
-      phone,
-      template,
-      variables,
-      image
-    );
+  phone,
+  template,
+  variables,
+  image,
+  numberType
+);
 
     res.json(response);
 
@@ -232,6 +246,9 @@ app.post("/webhook", async (req, res) => {
   try {
 
     const value = req.body.entry?.[0]?.changes?.[0]?.value;
+    const phoneNumberId = value?.metadata?.phone_number_id;
+const REALTOR_NUMBER_ID = "1098985376629421";
+const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
 
     // ✅ 1. DELIVERY STATUS HANDLER
     if (value?.statuses) {
@@ -322,14 +339,14 @@ app.post("/webhook", async (req, res) => {
       });
 
       // FIRST MESSAGE → WELCOME + FAQ
-      if (!userState[from].welcomed) {
-        userState[from].welcomed = true;
+      if (!userState[from].welcomed && !isRealtor) {
+  userState[from].welcomed = true;
 
-        await sendWelcome(from);
-        await sendFaqNumbers(from);
+  await sendWelcome(from);
+  await sendFaqNumbers(from);
 
-        return res.sendStatus(200);
-      }
+  return res.sendStatus(200);
+}
 
       // FAQ number replies
       if (["1", "2", "3", "4"].includes(text)) {
