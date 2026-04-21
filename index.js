@@ -88,22 +88,26 @@ app.get("/send", async (req, res) => {
   try {
     const { phone, template, image } = req.query;
 
-// 🔥 CLEAN + SAFE READ
-const numberRaw = (req.query.number || "")
-  .toString()
-  .trim()
-  .toLowerCase();
+    // 🔥 CLEAN + SAFE READ
+    const numberRaw = (req.query.number || "")
+      .toString()
+      .trim()
+      .toLowerCase();
 
-// 🔥 STRICT CONTROL
-const numberType = (numberRaw === "realtor") ? "realtor" : "client";
+    // 🔥 STRICT CONTROL
+    const numberType = (numberRaw === "realtor") ? "realtor" : "client";
 
-// 🔍 DEBUG (IMPORTANT)
-console.log("👉 Incoming number:", req.query.number);
-console.log("👉 Clean numberRaw:", numberRaw);
-console.log("👉 Final numberType:", numberType);
+    // 🔍 DEBUG
+    console.log("👉 Incoming number:", req.query.number);
+    console.log("👉 Clean numberRaw:", numberRaw);
+    console.log("👉 Final numberType:", numberType);
+
+    // ❗ REQUIRED CHECK
+    if (!phone || !template) {
+      return res.send("❌ Phone & template required");
     }
 
-    // Collect variables dynamically (v1 to v10)
+    // VARIABLES
     let variables = [];
     for (let i = 1; i <= 10; i++) {
       const val = req.query[`v${i}`];
@@ -111,12 +115,12 @@ console.log("👉 Final numberType:", numberType);
     }
 
     const response = await sendDynamicTemplate(
-  phone,
-  template,
-  variables,
-  image,
-  numberType
-);
+      phone,
+      template,
+      variables,
+      image,
+      numberType
+    );
 
     res.json(response);
 
