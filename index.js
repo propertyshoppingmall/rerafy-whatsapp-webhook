@@ -290,6 +290,10 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
 
     // ✅ 2. SAME AS OLD SCRIPT (UNCHANGED)
     const message = value?.messages?.[0];
+    // ❌ Ignore messages triggered by your own API (campaign/template)
+if (message?.context) {
+  return res.sendStatus(200);
+}
     if (!message) return res.sendStatus(200);
 
     const from = message.from;
