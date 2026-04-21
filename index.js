@@ -88,18 +88,12 @@ app.get("/send", async (req, res) => {
   try {
     const { phone, template, image } = req.query;
 
-    // 🔥 CLEAN + SAFE READ
-    const numberRaw = (req.query.number || "")
-      .toString()
-      .trim()
-      .toLowerCase();
-
-    // 🔥 STRICT CONTROL
-    if (!req.query.number) {
+       // 🔥 STRICT CONTROL (FINAL)
+if (!req.query.number) {
   return res.send("❌ number param missing");
 }
 
-const numberRaw = req.query.number.toString().trim().toLowerCase();
+let numberRaw = req.query.number.toString().trim().toLowerCase();
 
 if (numberRaw !== "client" && numberRaw !== "realtor") {
   return res.send("❌ invalid number type");
@@ -107,10 +101,9 @@ if (numberRaw !== "client" && numberRaw !== "realtor") {
 
 const numberType = numberRaw;
 
-    // 🔍 DEBUG
-    console.log("👉 Incoming number:", req.query.number);
-    console.log("👉 Clean numberRaw:", numberRaw);
-    console.log("👉 Final numberType:", numberType);
+// DEBUG
+console.log("👉 Incoming number:", req.query.number);
+console.log("👉 Final numberType:", numberType);
 
     // ❗ REQUIRED CHECK
     if (!phone || !template) {
