@@ -95,7 +95,17 @@ app.get("/send", async (req, res) => {
       .toLowerCase();
 
     // 🔥 STRICT CONTROL
-    const numberType = (numberRaw === "realtor") ? "realtor" : "client";
+    if (!req.query.number) {
+  return res.send("❌ number param missing");
+}
+
+const numberRaw = req.query.number.toString().trim().toLowerCase();
+
+if (numberRaw !== "client" && numberRaw !== "realtor") {
+  return res.send("❌ invalid number type");
+}
+
+const numberType = numberRaw;
 
     // 🔍 DEBUG
     console.log("👉 Incoming number:", req.query.number);
