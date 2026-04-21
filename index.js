@@ -22,6 +22,8 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbx20xcz7tIoNSwoWrCVzA
 // ================= SEND MESSAGE =================
 async function sendMessage(payload, numberType = "client") {
 
+  console.log("🚀 Sending from:", numberType);
+
   const config = NUMBERS[numberType];
 
   const url = `${GRAPH_URL}/${config.phone_id}/messages`;
@@ -84,11 +86,21 @@ async function sendDynamicTemplate(to, template, variables = [], image = null, n
 
 app.get("/send", async (req, res) => {
   try {
-    const { phone, template, image, number } = req.query;
-const numberType = number || "client";
+    const { phone, template, image } = req.query;
 
-    if (!phone || !template) {
-      return res.send("❌ Phone & template required");
+// 🔥 CLEAN + SAFE READ
+const numberRaw = (req.query.number || "")
+  .toString()
+  .trim()
+  .toLowerCase();
+
+// 🔥 STRICT CONTROL
+const numberType = (numberRaw === "realtor") ? "realtor" : "client";
+
+// 🔍 DEBUG (IMPORTANT)
+console.log("👉 Incoming number:", req.query.number);
+console.log("👉 Clean numberRaw:", numberRaw);
+console.log("👉 Final numberType:", numberType);
     }
 
     // Collect variables dynamically (v1 to v10)
