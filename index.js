@@ -134,7 +134,7 @@ async function saveLead(data) {
 
 
 // ================= WELCOME MESSAGE =================
-async function sendWelcome(to) {
+async function sendWelcome(to, numberType = "client") {
   return sendMessage({
     messaging_product: "whatsapp",
     to,
@@ -162,11 +162,11 @@ async function sendWelcome(to) {
         ]
       }
     }
-  });
+  }, numberType);
 }
 
 // ================= FAQ MENU =================
-async function sendFaqNumbers(to) {
+async function sendFaqNumbers(to, numberType = "client") {
   return sendMessage({
     messaging_product: "whatsapp",
     to,
@@ -180,12 +180,12 @@ async function sendFaqNumbers(to) {
         "3️⃣ Is *Rerafy™* free?\n" +
         "4️⃣ Which locations does *Rerafy™* cover?\n\n" +
         "Just reply with 1, 2, 3 or 4.",
-    },
-  });
+        }
+  }, numberType);
 }
 
 // ================= FAQ ANSWERS =================
-async function sendFaqAnswer(to, number) {
+async function sendFaqAnswer(to, number, numberType = "client") {
   let text = "";
 
   if (number === "1") {
@@ -222,11 +222,12 @@ async function sendFaqAnswer(to, number) {
     "If you want, share the project name or location you’re exploring and I’ll help you check it.";
 
   return sendMessage({
-    messaging_product: "whatsapp",
-    to,
-    type: "text",
-    text: { body: text },
-  });
+  messaging_product: "whatsapp",
+  to,
+  type: "text",
+  text: { body: text },
+}, numberType);
+
 }
 
 // ================= WEBHOOK VERIFY =================
@@ -249,6 +250,7 @@ app.post("/webhook", async (req, res) => {
     const phoneNumberId = value?.metadata?.phone_number_id;
 const REALTOR_NUMBER_ID = "1098985376629421";
 const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
+    const numberType = isRealtor ? "realtor" : "client";
 
     // ✅ 1. DELIVERY STATUS HANDLER
     if (value?.statuses) {
@@ -301,28 +303,28 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
 
       if (reply.id === "EXPERT") {
         await sendMessage({
-          messaging_product: "whatsapp",
-          to: from,
-          type: "text",
-          text: {
-            body:
-              "You’re now connecting with a human expert 👇\n\n" +
-              "Chat directly here:\n" +
-              "https://wa.me/917021418331",
-          },
-        });
+  messaging_product: "whatsapp",
+  to: from,
+  type: "text",
+  text: {
+    body:
+      "You’re now connecting with a human expert 👇\n\n" +
+      "Chat directly here:\n" +
+      "https://wa.me/917021418331",
+  },
+}, numberType);
         return res.sendStatus(200);
       }
 
       if (reply.id === "PRICE" || reply.id === "LEGAL") {
         await sendMessage({
-          messaging_product: "whatsapp",
-          to: from,
-          type: "text",
-          text: {
-            body: "Please share the project name or location you’re checking.",
-          },
-        });
+  messaging_product: "whatsapp",
+  to: from,
+  type: "text",
+  text: {
+    body: "Please share the project name or location you’re checking.",
+  },
+}, numberType);
         return res.sendStatus(200);
       }
     }
@@ -342,15 +344,15 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
       if (!userState[from].welcomed && !isRealtor) {
   userState[from].welcomed = true;
 
-  await sendWelcome(from);
-  await sendFaqNumbers(from);
+  await sendWelcome(from, numberType);
+await sendFaqNumbers(from, numberType);
 
   return res.sendStatus(200);
 }
 
       // FAQ number replies
       if (["1", "2", "3", "4"].includes(text)) {
-        await sendFaqAnswer(from, text);
+        await sendFaqAnswer(from, text, numberType);
         return res.sendStatus(200);
       }
 
