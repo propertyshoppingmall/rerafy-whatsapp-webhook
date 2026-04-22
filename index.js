@@ -314,7 +314,6 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
 // ================= BUTTON HANDLING =================
 if (message.type === "interactive") {
 
-  // ✅ EXISTING (KEEP AS IS)
   if (!userState[from].welcomed && !isRealtor) {
     userState[from].welcomed = true;
 
@@ -332,62 +331,7 @@ if (message.type === "interactive") {
     message: reply.title,
   }, numberType);
 
-  // 🔥 ADD THESE 3 CONDITIONS (NEW)
-
-if (reply.id === "JOIN_COMMUNITY") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "text",
-    text: {
-      body:
-        "Join our Realtors Network 👇\n\n" +
-        "https://chat.whatsapp.com/xxxxx\n\n" +
-        "Reply JOINED after entering."
-    },
-  }, numberType);
-  return res.sendStatus(200);
-}
-
-if (reply.id === "VIEW_LISTINGS") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: {
-        text:
-          "Here are latest listings 👇\n\n" +
-          "https://whatsapp.com/channel/xxxxx"
-      },
-      action: {
-        buttons: [
-          { type: "reply", reply: { id: "SHOW", title: "Show Deals" } },
-          { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
-        ]
-      }
-    }
-  }, numberType);
-  return res.sendStatus(200);
-}
-
-if (reply.id === "CALL_NOW") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "text",
-    text: {
-      body:
-        "Connect instantly with our team 👇\n\n" +
-        "https://wa.me/917021418331\n\n" +
-        "Or reply here with your requirement."
-    },
-  }, numberType);
-  return res.sendStatus(200);
-}
-
-  // ✅ YOUR EXISTING LOGIC (UNCHANGED)
+  // ✅ EXISTING LOGIC ONLY
 
   if (reply.id === "EXPERT") {
     await sendMessage({
@@ -418,65 +362,78 @@ if (reply.id === "CALL_NOW") {
 
   return res.sendStatus(200);
 }
+// ================= TEMPLATE BUTTON HANDLING =================
+else if (message.type === "button") {
 
+  const payload = (message.button?.payload || "").toUpperCase().trim();
+  const text = (message.button?.text || "").toLowerCase().trim();
 
-// 🔥 NEW BUTTON HANDLING (ADD ONLY)
-
-if (payload === "JOIN_COMMUNITY" || text === "Join Community") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "text",
-    text: {
-      body:
-        "Join our Realtors Network 👇\n\n" +
-        "https://chat.whatsapp.com/xxxxx\n\n" +
-        "Reply JOINED after entering."
-    }
+  await saveLead({
+    phone: from,
+    name: userState[from]?.name || "",
+    type: "button",
+    button: payload,
+    message: text,
   }, numberType);
 
-  return res.sendStatus(200);
-}
+  // 🔥 YOUR BUTTONS
 
-if (payload === "VIEW_LISTINGS" || text === "View More Listings") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: {
-        text:
-          "Here are latest listings 👇\n\n" +
-          "https://whatsapp.com/channel/xxxxx"
-      },
-      action: {
-        buttons: [
-          { type: "reply", reply: { id: "SHOW", title: "Show Deals" } },
-          { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
-        ]
+  if (payload === "JOIN_COMMUNITY" || text === "join community") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body:
+          "Join our Realtors Network 👇\n\n" +
+          "https://chat.whatsapp.com/xxxxx\n\n" +
+          "Reply JOINED after entering."
       }
-    }
-  }, numberType);
+    }, numberType);
+    return res.sendStatus(200);
+  }
+
+  if (payload === "VIEW_LISTINGS" || text === "view more listings") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "interactive",
+      interactive: {
+        type: "button",
+        body: {
+          text:
+            "Here are latest listings 👇\n\n" +
+            "https://whatsapp.com/channel/xxxxx"
+        },
+        action: {
+          buttons: [
+            { type: "reply", reply: { id: "SHOW", title: "Show Deals" } },
+            { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
+          ]
+        }
+      }
+    }, numberType);
+    return res.sendStatus(200);
+  }
+
+  if (payload === "CALL_NOW" || text === "call now") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body:
+          "Connect instantly with our team 👇\n\n" +
+          "https://wa.me/917021418331\n\n" +
+          "Or reply here with your requirement."
+      }
+    }, numberType);
+    return res.sendStatus(200);
+  }
 
   return res.sendStatus(200);
 }
 
-if (payload === "CALL_NOW" || text === "Call Now") {
-  await sendMessage({
-    messaging_product: "whatsapp",
-    to: from,
-    type: "text",
-    text: {
-      body:
-        "Connect instantly with our team 👇\n\n" +
-        "https://wa.me/917021418331\n\n" +
-        "Or reply here with your requirement."
-    }
-  }, numberType);
-
-  return res.sendStatus(200);
-}
     // ================= TEXT HANDLING =================
     if (message.type === "text") {
       const text = message.text.body.trim();
