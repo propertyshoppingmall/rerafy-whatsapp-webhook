@@ -334,58 +334,58 @@ if (message.type === "interactive") {
 
   // 🔥 ADD THESE 3 CONDITIONS (NEW)
 
-  if (reply.title === "Join Community") {
-    await sendMessage({
-      messaging_product: "whatsapp",
-      to: from,
-      type: "text",
-      text: {
-        body:
-          "Join our Realtors Network 👇\n\n" +
-          "https://chat.whatsapp.com/xxxxx\n\n" +
-          "Reply JOINED after entering."
-      },
-    }, numberType);
-    return res.sendStatus(200);
-  }
+if (reply.id === "JOIN_COMMUNITY") {
+  await sendMessage({
+    messaging_product: "whatsapp",
+    to: from,
+    type: "text",
+    text: {
+      body:
+        "Join our Realtors Network 👇\n\n" +
+        "https://chat.whatsapp.com/xxxxx\n\n" +
+        "Reply JOINED after entering."
+    },
+  }, numberType);
+  return res.sendStatus(200);
+}
 
-  if (reply.title === "View More Listings") {
-    await sendMessage({
-      messaging_product: "whatsapp",
-      to: from,
-      type: "interactive",
-      interactive: {
-        type: "button",
-        body: {
-          text:
-            "Here are latest listings 👇\n\n" +
-            "https://whatsapp.com/channel/xxxxx"
-        },
-        action: {
-          buttons: [
-            { type: "reply", reply: { id: "SHOW", title: "Show Deals" } },
-            { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
-          ]
-        }
+if (reply.id === "VIEW_LISTINGS") {
+  await sendMessage({
+    messaging_product: "whatsapp",
+    to: from,
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text:
+          "Here are latest listings 👇\n\n" +
+          "https://whatsapp.com/channel/xxxxx"
+      },
+      action: {
+        buttons: [
+          { type: "reply", reply: { id: "SHOW", title: "Show Deals" } },
+          { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
+        ]
       }
-    }, numberType);
-    return res.sendStatus(200);
-  }
+    }
+  }, numberType);
+  return res.sendStatus(200);
+}
 
-  if (reply.title === "Call Now") {
-    await sendMessage({
-      messaging_product: "whatsapp",
-      to: from,
-      type: "text",
-      text: {
-        body:
-          "Connect instantly with our team 👇\n\n" +
-          "https://wa.me/917021418331\n\n" +
-          "Or reply here with your requirement."
-      },
-    }, numberType);
-    return res.sendStatus(200);
-  }
+if (reply.id === "CALL_NOW") {
+  await sendMessage({
+    messaging_product: "whatsapp",
+    to: from,
+    type: "text",
+    text: {
+      body:
+        "Connect instantly with our team 👇\n\n" +
+        "https://wa.me/917021418331\n\n" +
+        "Or reply here with your requirement."
+    },
+  }, numberType);
+  return res.sendStatus(200);
+}
 
   // ✅ YOUR EXISTING LOGIC (UNCHANGED)
 
