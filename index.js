@@ -311,46 +311,93 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
     // 👉 KEEP YOUR OLD TEXT LOGIC
 
 
-    // ================= BUTTON HANDLING =================
-    if (message.type === "interactive") {
-      const reply = message.interactive.button_reply;
+// ================= BUTTON HANDLING =================
+if (message.type === "interactive") {
 
-      await saveLead({
-  phone: from,
-  name: userState[from]?.name || "",
-  type: "button",
-  button: reply.id,
-  message: reply.title,
-}, numberType);
+  const reply = message.interactive.button_reply;
 
-      if (reply.id === "EXPERT") {
-        await sendMessage({
-  messaging_product: "whatsapp",
-  to: from,
-  type: "text",
-  text: {
-    body:
-      "You’re now connecting with a human expert 👇\n\n" +
-      "Chat directly here:\n" +
-      "https://wa.me/917021418331",
-  },
-}, numberType);
-        return res.sendStatus(200);
-      }
+  await saveLead({
+    phone: from,
+    name: userState[from]?.name || "",
+    type: "button",
+    button: reply.id,
+    message: reply.title,
+  }, numberType);
 
-      if (reply.id === "PRICE" || reply.id === "LEGAL") {
-        await sendMessage({
-  messaging_product: "whatsapp",
-  to: from,
-  type: "text",
-  text: {
-    body: "Please share the project name or location you’re checking.",
-  },
-}, numberType);
-        return res.sendStatus(200);
-      }
-    }
+  if (reply.id === "EXPERT") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body:
+          "You’re now connecting with a human expert 👇\n\n" +
+          "Chat directly here:\n" +
+          "https://wa.me/917021418331",
+      },
+    }, numberType);
+    return res.sendStatus(200);
+  }
 
+  if (reply.id === "PRICE" || reply.id === "LEGAL") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body: "Please share the project name or location you’re checking.",
+      },
+    }, numberType);
+    return res.sendStatus(200);
+  }
+
+  return res.sendStatus(200);
+}
+
+
+// ================= TEMPLATE BUTTON HANDLING =================
+else if (message.type === "button") {
+
+  const payload = message.button?.payload || "";
+  const text = message.button?.text || "";
+
+  await saveLead({
+    phone: from,
+    name: userState[from]?.name || "",
+    type: "button",
+    button: payload,
+    message: text,
+  }, numberType);
+
+  if (payload === "EXPERT") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body:
+          "You’re now connecting with a human expert 👇\n\n" +
+          "Chat directly here:\n" +
+          "https://wa.me/917021418331",
+      },
+    }, numberType);
+    return res.sendStatus(200);
+  }
+
+  if (payload === "PRICE" || payload === "LEGAL") {
+    await sendMessage({
+      messaging_product: "whatsapp",
+      to: from,
+      type: "text",
+      text: {
+        body: "Please share the project name or location you’re checking.",
+      },
+    }, numberType);
+    return res.sendStatus(200);
+  }
+
+  return res.sendStatus(200);
+}
     // ================= TEXT HANDLING =================
     if (message.type === "text") {
       const text = message.text.body.trim();
