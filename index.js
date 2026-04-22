@@ -176,9 +176,9 @@ async function sendWelcome(to, numberType = "client") {
       },
       action: {
         buttons: [
-          { type: "reply", reply: { id: "PRICE", title: "Check Project Prices" } },
-          { type: "reply", reply: { id: "LEGAL", title: "Check Legal / Risk" } },
-          { type: "reply", reply: { id: "EXPERT", title: "Chat with Expert" } }
+          { type: "reply", reply: { id: "PRICE", title: "Project Prices Check" } },
+          { type: "reply", reply: { id: "LEGAL", title: "Legal Check" } },
+          { type: "reply", reply: { id: "EXPERT", title: "Talk to Expert" } }
         ]
       }
     }
@@ -314,6 +314,14 @@ const isRealtor = phoneNumberId === REALTOR_NUMBER_ID;
 // ================= BUTTON HANDLING =================
 if (message.type === "interactive") {
 
+  // ✅ ADD THIS BLOCK (ONLY CHANGE)
+  if (!userState[from].welcomed && !isRealtor) {
+    userState[from].welcomed = true;
+
+    await sendWelcome(from, numberType);
+    await sendFaqNumbers(from, numberType);
+  }
+
   const reply = message.interactive.button_reply;
 
   await saveLead({
@@ -357,6 +365,14 @@ if (message.type === "interactive") {
 
 // ================= TEMPLATE BUTTON HANDLING =================
 else if (message.type === "button") {
+
+  // ✅ ADD THIS BLOCK (ONLY CHANGE)
+  if (!userState[from].welcomed && !isRealtor) {
+    userState[from].welcomed = true;
+
+    await sendWelcome(from, numberType);
+    await sendFaqNumbers(from, numberType);
+  }
 
   const payload = message.button?.payload || "";
   const text = message.button?.text || "";
