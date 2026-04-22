@@ -137,7 +137,7 @@ console.log("👉 Final numberType:", numberType);
 const userState = {};
 
 // ================= SAVE LEAD TO GOOGLE SHEET =================
-async function saveLead(data) {
+async function saveLead(data, numberType = "client") {
   await fetch(SHEET_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -147,6 +147,7 @@ async function saveLead(data) {
       type: data.type || "",
       button: data.button || "",
       message: data.message || "",
+      phone_number_id: numberType   // 🔥 KEY FIX
     }),
   });
 }
@@ -317,12 +318,12 @@ if (message?.context) {
       const reply = message.interactive.button_reply;
 
       await saveLead({
-        phone: from,
-        name: userState[from]?.name || "",
-        type: "button",
-        button: reply.id,
-        message: reply.title,
-      });
+  phone: from,
+  name: userState[from]?.name || "",
+  type: "button",
+  button: reply.id,
+  message: reply.title,
+}, numberType);
 
       if (reply.id === "EXPERT") {
         await sendMessage({
@@ -357,11 +358,11 @@ if (message?.context) {
       const text = message.text.body.trim();
 
       await saveLead({
-        phone: from,
-        name: userState[from]?.name || "",
-        type: "text",
-        message: text,
-      });
+  phone: from,
+  name: userState[from]?.name || "",
+  type: "text",
+  message: text,
+}, numberType);
 
       // FIRST MESSAGE → WELCOME + FAQ
       if (!userState[from].welcomed && !isRealtor) {
