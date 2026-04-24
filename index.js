@@ -61,8 +61,24 @@ async function sendDynamicTemplate(to, template, variables = [], image = null, n
     });
   }
 
-  // 👉 Body variables
-  if (variables.length > 0) {
+  // 👉 Body variables (DUAL SUPPORT: OLD + NEW)
+if (variables.length > 0) {
+
+  // ✅ NEW TEMPLATE (named variable)
+  if (template === "rerafy_text_template") {   // 🔥 replace with your template name
+    components.push({
+      type: "body",
+      parameters: [
+        {
+          type: "text",
+          text: variables[0] || "Customer"
+        }
+      ]
+    });
+  }
+
+  // ✅ OLD TEMPLATE (v1, v2, v3...)
+  else {
     components.push({
       type: "body",
       parameters: variables.map(v => ({
@@ -71,6 +87,7 @@ async function sendDynamicTemplate(to, template, variables = [], image = null, n
       }))
     });
   }
+}
 
   return sendMessage({
   messaging_product: "whatsapp",
