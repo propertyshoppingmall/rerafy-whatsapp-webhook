@@ -71,7 +71,7 @@ if (variables.length > 0) {
       parameters: [
         {
           type: "text",
-          text: variables[0] || "Customer"
+          text: (variables[0] || "Customer").toString().trim()
         }
       ]
     });
