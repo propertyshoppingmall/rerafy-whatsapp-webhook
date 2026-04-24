@@ -365,6 +365,14 @@ if (message.type === "interactive") {
 // ================= TEMPLATE BUTTON HANDLING =================
 else if (message.type === "button") {
 
+  // 🔥 ADD THIS (FIX)
+  if (!userState[from].welcomed && !isRealtor) {
+    userState[from].welcomed = true;
+
+    await sendWelcome(from, numberType);
+    await sendFaqNumbers(from, numberType);
+  }
+
   const payload = (message.button?.payload || "").toUpperCase().trim();
   const text = (message.button?.text || "").toLowerCase().trim();
 
