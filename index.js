@@ -61,27 +61,18 @@ async function sendDynamicTemplate(to, template, variables = [], image = null, n
     });
   }
 
-  // 👉 Body variables (DUAL SUPPORT: OLD + NEW)
+  // 👉 UNIVERSAL VARIABLE HANDLING (FINAL)
+
 if (variables.length > 0) {
 
-  // ✅ NEW TEMPLATE (named variable)
-  if (template === "rerafy_text_template") {   // 🔥 replace with your template name
-    components.push({
-      type: "body",
-      parameters: [
-        {
-          type: "text",
-          text: (variables[0] || "Customer").toString().trim()
-        }
-      ]
-    });
-  }
+  const cleanVars = variables
+    .map(v => (v || "").toString().trim())
+    .filter(v => v !== "");
 
-  // ✅ OLD TEMPLATE (v1, v2, v3...)
-  else {
+  if (cleanVars.length > 0) {
     components.push({
       type: "body",
-      parameters: variables.map(v => ({
+      parameters: cleanVars.map(v => ({
         type: "text",
         text: v
       }))
