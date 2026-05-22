@@ -86,7 +86,7 @@ if (variables.length > 0) {
   type: "template",
   template: {
     name: template,
-    language: { code: "en" },
+    language: { code: "en_US" },
     ...(components.length > 0 && { components })
   }
 }, numberType);
